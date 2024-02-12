@@ -29,13 +29,13 @@ contract LookUpContract{
 
     uint256 public listingPrice = 0.025 ether;
     mapping(uint256 => ERC20Token) private erc20Tokens;
-    mapping(uint256 => Donation) private donation;
+    mapping(uint256 => Donation) private donations;
 
-    uint256 public _tokenIndex; // user add toke nthen this value increments
+    uint256 public _tokenIndex; // user add token then this value increments
     uint256 public _donationIndex; // User donated they increments
 
-    event DoantionReceived(address indexed donor, uint256 amout);
-    event ERC20TokenList(uint256 indexed id, address indexed owner, string indexed token);
+    event DonationReceived(address indexed donor, uint256 amout);
+    event ERC20TokenListed(uint256 indexed id, address indexed owner, string indexed token);
 
 
     modifier onlyOwner(){
@@ -48,19 +48,19 @@ contract LookUpContract{
     ) payable external returns(uint256,address,string memory, string memory, string memory, string memory){
         _tokenIndex++;
         uint256 _tokenId = _tokenIndex;
-        ERC20Token storage erc20Tokens = erc20Tokens[_tokenId];
+        ERC20Token storage erc20Token = erc20Tokens[_tokenId];
 
         // Update the Data(Information)
-        erc20Tokens.tokenID = _tokenId;
-        erc20Tokens.owner = _owner;
-        erc20Tokens.tokenSupply = _tokenSupply;
-        erc20Tokens.tokenName = _tokenName;
-        erc20Tokens.tokenSymbol = _tokenSymbol;
-        erc20Tokens.tokenAddress = _tokenAddress;
-        erc20Tokens.tokenTransactionHash = _tokenTransactionHash;
-        erc20Tokens.tokenCreateDate = _tokenCreateDate;
+        erc20Token.tokenID = _tokenId;
+        erc20Token.owner = _owner;
+        erc20Token.tokenSupply = _tokenSupply;
+        erc20Token.tokenName = _tokenName;
+        erc20Token.tokenSymbol = _tokenSymbol;
+        erc20Token.tokenAddress = _tokenAddress;
+        erc20Token.tokenTransactionHash = _tokenTransactionHash;
+        erc20Token.tokenCreateDate = _tokenCreateDate;
 
-        emit ERC20TokenList(_tokenId, _owner, _tokenAddress);
+        emit ERC20TokenListed(_tokenId, _owner, _tokenAddress);
 
         return (_tokenId, _owner, _tokenAddress, _tokenName, _tokenSymbol, _tokenAddress);
 
@@ -82,31 +82,38 @@ contract LookUpContract{
         return items;
     }
 
-    function getERC20Token(uint256 _tokenID) external view returns(uint256, address, string memory, string memory,
-        string memory, string memory, string memory, string memory
-    )
+    function getERC20Token(uint256 _tokenID) external view returns(
+        uint256,
+        address, 
+        string memory, 
+        string memory,
+        string memory, 
+        string memory, 
+        string memory, 
+        string memory)
     {
         // here, give an information of passed token.
-        ERC20Token memory erc20Tokens = erc20Tokens[_tokenID];
+        ERC20Token memory erc20Token = erc20Tokens[_tokenID];
 
         return (
-            erc20Tokens.tokenID,
-            erc20Tokens.owner,
-            erc20Tokens.tokenSupply,
-            erc20Tokens.tokenName,
-            erc20Tokens.tokenSymbol,
-            erc20Tokens.tokenAddress,
-            erc20Tokens.tokenTransactionHash,
-            erc20Tokens.tokenCreateDate,
+            erc20Token.tokenID,
+            erc20Token.owner,
+            erc20Token.tokenSupply,
+            erc20Token.tokenName,
+            erc20Token.tokenSymbol,
+            erc20Token.tokenAddress,
+            erc20Token.tokenTransactionHash,
+            erc20Token.tokenCreateDate
         );
     }
 
-    function getUserERC20Tokens(address _user)external view returns(ERC20Token[] memory){
+    function getUserERC20Tokens(address _user) external view returns(ERC20Token[] memory){
         uint256 totalItemCount = _tokenIndex;
         uint256 itemCount = 0;
         uint256 currentIndex = 0;
+
         for (uint256 i = 0; i < itemCount; i++) {
-            if(erc20Tokens=[i+1].owner == _user){
+            if(erc20Tokens[i+1].owner == _user){
                 itemCount += 1;
             }
         }
@@ -116,7 +123,7 @@ contract LookUpContract{
             if(erc20Tokens[i+1].owner == _user){
                 uint256 currentId = i+1;
                 ERC20Token storage currentItem = erc20Tokens[currentId];
-                items[currentIndex] = currentIndex;
+                items[currentIndex] = currentItem;
                 currentIndex += 1;
             }
         }
@@ -135,8 +142,8 @@ contract LookUpContract{
 
     function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
-        require(balance > 0, "No donation available for withdraw");
-        payable(contractOwner).tranfer(balance);
+        require(balance > 0, "No donation available for withdrawal");
+        payable(contractOwner).transfer(balance);
     }
 
     function getContractBalance() external view onlyOwner returns(uint256) {
@@ -148,13 +155,13 @@ contract LookUpContract{
         require(msg.value > 0, "Donation value must be greater then 0");
         _donationIndex++;
         uint256 _donationId = _donationIndex;
-        Donation storage donation = donation[_donationId];
+        Donation storage donation = donations[_donationId];
         donation.donationID = _donationId;
         donation.donor = msg.sender;
         donation.fund = msg.value;
 
 
-        emit DoantionReceived(msg.sender, msg.value);
+        emit DonationReceived(msg.sender, msg.value);
     }
 
     function getAllDonation() public view returns(Donation[] memory){
@@ -164,7 +171,7 @@ contract LookUpContract{
         Donation[] memory items = new Donation[](itemCount);
         for (uint256 i = 0; i < itemCount; i++) {
             uint256 currentId = i + 1;
-            Donation storage currentItem = donation[currentId];
+            Donation storage currentItem = donations[currentId];
             items[currentIndex] = currentItem;
             currentIndex+=1;
         }
