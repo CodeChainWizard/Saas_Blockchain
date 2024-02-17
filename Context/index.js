@@ -153,4 +153,130 @@ export const StateContextProvider = ({
             console.log(error);
         }
     }
-}
+
+    const _createERC20Token = async(
+        _owner,
+        _tokenSupply,
+        _tokenName,
+        _tokenSymbol,
+        _tokenAddress,
+        _tokenTransactionHash,
+        _tokenCreatedDate
+    ) => {
+        try {
+            const contract = await connectingWithContarct();
+
+            const listingPrice = await contract.getAllERC20TokenListingPrice();
+            const transation = await contract.createERC20Token(
+                _owner,
+                _tokenSupply,
+                _tokenName,
+                _tokenSymbol,
+                _tokenAddress,
+                _tokenTransactionHash,
+                _tokenCreatedDate,
+                {
+                    value: listingPrice.toString(),
+                }
+            );
+
+            await transation.wait();
+            console.log(transation);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const createERC20 = async(token) =>{
+        const {name, symbol, supply} = token;
+
+        console.log(name, symbol, Number(supply));
+
+        try {
+            if(!name || !symbol || !supply){
+                console.log(token);
+            }else{
+                console.log(name, symbol, supply);
+                const account = await CheckIfWalletConnect();
+                console.log(account);
+                const web3modal = new Web3Modal();
+                const connectins = await web3modal.connect();
+                const provider = await ethers.providers.Web3Provider(connectins);
+                const signer = provider.getSigner();
+                _deployContract(signer, account, name, symbol, supply);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const withdrawFund = async() => {
+        try {
+            const contract = await connectingWithContarct();
+            const withdraw = await contract.withdraw();
+            await withdraw.wait();
+            console.log(withdraw);
+            withdraw.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const donatFund = async() => {
+        try {
+            const donationAmount = ethers.utils.parseEther("1");
+            const contract = await connectingWithContarct();
+            const donate = await contract.donate({
+                value: donationAmount.toString(),
+            });
+
+            await donate.wait();
+            console.log(donate);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    //----> This function use for transer token any other address
+    const transferNativeToken = async(token) => {
+        try {
+           const {address, tokenNo} = token;
+           console.log(address, token);
+           const transerAmount = ethers.utils.parseEther(tokenNo);
+           
+           const contract = await connectingNativeTokenContext();
+           const transation = await contract.transfer(address, transerAmount);
+
+           await transation.wait();
+           console.log(transation);
+           window.location.reload();
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return (
+        <StateContext.Provider value={{
+            createERC20,
+            withdrawFund,
+            donatFund,
+            transferNativeToken,
+            getAllERC20TokenListed,
+            getUserERC20Tokens,
+            getAllDonation,
+            fee,
+            address,
+            balance,
+            mainBalance,
+            nativeToken,
+        }}>
+            {childern}
+        </StateContext.Provider>
+    );
+};
+
+export const useStateContext = () => useContext(StateContext);
+
