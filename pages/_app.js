@@ -16,10 +16,11 @@ export default function App({Component, pagePros}){
       <script src="js/owl.carousel.min.js"></script>
       <script src="js/popper.min.js"></script>
       <script src="js/jquery.nice-select.min.js"></script>
-      <script src="js/jquery.meanmenu.min.js"></script>
+      <script src="js/jquery.meanmenu.js"></script>
       <script src="js/wow.min.js"></script>
       <script src="js/plugins.js"></script>
-      <script src="js/main.js"></script>
+      <script src="js/main.js"></script> 
+
     </>
   );
 }

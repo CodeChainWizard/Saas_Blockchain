@@ -6,8 +6,6 @@ import Web3Modal from "web3modal";
 import {CheckIfWalletConnect, connectWallet, connectingWithContarct, getBalance, connectingNativeTokenContext} from "../Utils/index";
 import { ERC20Generator_ABI, ERC20Generator_BYPECODE } from "./constants";
 
-import {ERC20Generator_ABI, ERC20Generator_BYPECODE} from "./constants";
-
 const StateContext = createContext();
 
 // ---> Here, manage the data....
@@ -30,7 +28,7 @@ export const StateContextProvider = ({
 
             // Get User Balance
             const balance = await getBalance();
-            setBalance(ethers.utils.formatEther(balance.toString()));
+            setBalance(ethers.utils.formatEther(balance));
             setAddress(account);
 
             // Native Token
@@ -54,7 +52,7 @@ export const StateContextProvider = ({
 
                 setNativeToken(nativeToken);
 
-                console.log(nativeContract);
+                // console.log(nativeContract);
             }
 
             //---> Get Contract
